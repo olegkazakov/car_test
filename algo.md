@@ -18,6 +18,7 @@
 Возможные статусы у автомобиля - reserve, inspect, on_trip, park, free, on_repair (бронь, осмотр, поездка, парковка, свободен, на ремонте).
 
 ###Этап бронирования
+
 При запросе о начале бронирования, создаем новую запись в таблице car_rent со статусом reserve и в таблице car у соответствующего
 автомобиля устанавливаем status=reserve, фиксируем время начала бронирования reserve_begin_dt и подтверждаем аренду.
 При переходе аренды к этапу осмотра, фиксируем время завершения бронирования reserve_end_dt и 
@@ -35,6 +36,7 @@ reserve_price = (reserve_price_time - reserve_free_period) * reserve_minute_pric
 Записываем стоимость этапа бронирования в reserve_price у car_rent. 
 
 ###Осмотр
+
 На этапе осмотра фиксируем время начала inspect_begin_dt и завершения inspect_end_dt.
 Если разница inspect_end_dt - inspect_begin_dt > inspect_free_period у тарифа, 
 то приводим к минутам разницу и умножаем на стоимость минуты:
@@ -43,6 +45,7 @@ inspect_price  = (minutes(inspect_end_dt - inspect_begin_dt)- inspect_free_perio
 Записываем времена и стоимость этапа.
 
 ###Поездка
+
 На этапе поездки фиксируем trip_begin_dt. При переходе на этап парковки в trip_time_total записываем разницу между текущим временем 
 и trip_begin_dt. При возобновлении поездки фиксируем trip_replay_dt. 
 При новой парковке добавляем в общее время поезки разницу между текущим временем и trip_replay_dt.
@@ -56,12 +59,14 @@ trip_dist_price  = (trip_dist - trip_base_dist) * trip_dist_km_price, иначе
 Также увеличиваем mileage_today и mileage_total у car.
 
 ###Парковка
+
 Аналогично этапу бронирования рассчитываем стоимость парковки, только учитываем, что этап
 может повторяться неоднократно: park_time_total увеличиваем на разницу текущего времени и park_replay_dt (как на этапе поездки).
 park_total = minutes(park_time_total) * park_minute_price.
 Если park_total > 0, то учитываем коэффициенты.
 
 ###Завершение поездки
+
 При нажатии на кнопку "Завершить" записываем время завершения соответствующего этапа, рассчитываем
 стоимость данного этапа, записываем. Считаем total_time как разность времени окончания этапа, на котором завершили поездку 
 (reserve_end_dt, inspect_end_dt, trip_end_dt или park_end_dt) и reserve_begin_dt.
