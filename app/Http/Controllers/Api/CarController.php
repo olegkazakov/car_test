@@ -7,19 +7,33 @@ use App\Models\Car;
 use App\Models\Car\Rent\Tariff as RentTariff;
 use App\Models\User;
 
-
+// @formatter:off
+/**
+ * Получение тарифа для указанного пользователя и автомобиля
+ * @api {get} /api/car/get-tariff/user_id/car_id
+ * @apiName GetTariff
+ * @apiGroup Car
+ * @apiParam {user-id} user-id Идентификатор пользователя.
+ * @apiParam {car-id} car-id Id автомобиля.
+ *
+ * @apiExample Пример использования:
+ *
+ * >curl -X GET http://car_test.local/api/car/get-tariff/1/1 \
+ * -H "Accept: application/json" \
+ * -H "Content-Type: application/json"
+ *
+ */
+// @formatter:on
 class CarController extends Controller
 {
-    public function index()
-    {
-        dd(Car::all());
-    }
- 
-    public function show($id)
-    {
-        return Car::find($id);
-    }
-
+    /**
+     * Method returns tariff for current user and car.
+     *
+     * @param $user_id
+     * @param $car_id
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getTariff($user_id, $car_id)
     {
         if (!isset($user_id) || !isset($car_id) || !is_numeric($user_id) || !is_numeric($car_id)) {
