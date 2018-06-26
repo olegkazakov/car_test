@@ -1,13 +1,4 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
-
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
-
-### Алгоритм работы системы тарификации краткосрочной аренды автомобиля:
+## Алгоритм работы системы тарификации краткосрочной аренды автомобиля:
 
 Изначально предполагаем, что пользователь подтвержден, данные, в том числе права, указаны корректно, договор заключен.
 
@@ -26,7 +17,7 @@
 
 Возможные статусы у автомобиля - reserve, inspect, on_trip, park, free, on_repair (бронь, осмотр, поездка, парковка, свободен, на ремонте).
 
-####Этап бронирования
+###Этап бронирования
 При запросе о начале бронирования, создаем новую запись в таблице car_rent со статусом reserve и в таблице car у соответствующего
 автомобиля устанавливаем status=reserve, фиксируем время начала бронирования reserve_begin_dt и подтверждаем аренду.
 При переходе аренды к этапу осмотра, фиксируем время завершения бронирования reserve_end_dt и 
@@ -43,7 +34,7 @@ reserve_price = (reserve_price_time - reserve_free_period) * reserve_minute_pric
   - если установлен в 1 car_class_koef_is у car_tariff, то reserve_price умножаем на class_koef у car_class.
 Записываем стоимость этапа бронирования в reserve_price у car_rent. 
 
-####Осмотр
+###Осмотр
 На этапе осмотра фиксируем время начала inspect_begin_dt и завершения inspect_end_dt.
 Если разница inspect_end_dt - inspect_begin_dt > inspect_free_period у тарифа, 
 то приводим к минутам разницу и умножаем на стоимость минуты:
@@ -51,7 +42,7 @@ inspect_price  = (minutes(inspect_end_dt - inspect_begin_dt)- inspect_free_perio
 Если inspect_price  > 0, то учитываем коэффициенты, как для этапа бронирования.
 Записываем времена и стоимость этапа.
 
-####Поездка
+###Поездка
 На этапе поездки фиксируем trip_begin_dt. При переходе на этап парковки в trip_time_total записываем разницу между текущим временем 
 и trip_begin_dt. При возобновлении поездки фиксируем trip_replay_dt. 
 При новой парковке добавляем в общее время поезки разницу между текущим временем и trip_replay_dt.
@@ -64,13 +55,13 @@ trip_dist_price  = (trip_dist - trip_base_dist) * trip_dist_km_price, иначе
 Если полученная trip_dist_price  > 0, то учитываем коэффициенты, как для этапа бронирования.
 Также увеличиваем mileage_today и mileage_total у car.
 
-####Парковка
+###Парковка
 Аналогично этапу бронирования рассчитываем стоимость парковки, только учитываем, что этап
 может повторяться неоднократно: park_time_total увеличиваем на разницу текущего времени и park_replay_dt (как на этапе поездки).
 park_total = minutes(park_time_total) * park_minute_price.
 Если park_total > 0, то учитываем коэффициенты.
 
-####Завершение поездки
+###Завершение поездки
 При нажатии на кнопку "Завершить" записываем время завершения соответствующего этапа, рассчитываем
 стоимость данного этапа, записываем. Считаем total_time как разность времени окончания этапа, на котором завершили поездку 
 (reserve_end_dt, inspect_end_dt, trip_end_dt или park_end_dt) и reserve_begin_dt.
